@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AquaBalance BD — Sistem Dinamik Neraca Air Bersih Kota Bandung</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <!-- Layered White Canvas with Subtle Hydro-Tech Accents -->
+  <div class="bg-canvas" aria-hidden="true">
+    <div class="bg-dot-grid"></div>
+    <div class="bg-blob bg-blob-1"></div>
+    <div class="bg-blob bg-blob-2"></div>
+    <div class="bg-blob bg-blob-3"></div>
+    <svg class="bg-wave-svg" viewBox="0 0 1440 220" preserveAspectRatio="none">
+      <path fill="rgba(186, 230, 253, 0.25)" d="M0,128L60,138.7C120,149,240,171,360,165.3C480,160,600,128,720,117.3C840,107,960,117,1080,133.3C1200,149,1320,171,1380,181.3L1440,192L1440,220L1380,220C1320,220,1200,220,1080,220C960,220,840,220,720,220C600,220,480,220,360,220C240,220,120,220,60,220L0,220Z"></path>
+      <path fill="rgba(204, 251, 241, 0.28)" d="M0,160L80,149.3C160,139,320,117,480,122.7C640,128,800,160,960,165.3C1120,171,1280,149,1360,138.7L1440,128L1440,220L1360,220C1280,220,1120,220,960,220C800,220,640,220,480,220C320,220,160,220,80,220L0,220Z"></path>
+    </svg>
+  </div>
+
+  <div class="app-shell">
+    <!-- ATTRACTIVE LEFT VERTICAL SIDEBAR NAVBAR (5 MENUS) -->
+    <aside class="sidebar" id="sidebar">
+      <div>
+        <!-- Brand Header -->
+        <div class="sidebar-header">
+          <div class="brand-wrap">
+            <div class="brand-logo">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+                <path d="M8 14a4 4 0 0 0 8 0" opacity="0.75"></path>
+              </svg>
+            </div>
+            <div class="brand-text">
+              <div class="brand-title">AquaBalance BD</div>
+              <div class="brand-sub">System Dynamics Lab</div>
+            </div>
+          </div>
+          <button class="collapse-btn" id="sidebarToggle" title="Perkecil / Perlebar Navbar">
+            <i data-lucide="panel-left-close" style="width:16px;height:16px;"></i>
+          </button>
+        </div>
+
+        <div class="sidebar-section-title">Navigasi Utama (5 Menu)</div>
+
+        <!-- 5 Navigation Items -->
+        <ul class="nav-menu" id="navMenu">
+          <li class="nav-item active" data-target="overview">
+            <div class="nav-item-left">
+              <span class="nav-icon-box"><i data-lucide="layout-dashboard" style="width:18px;height:18px;"></i></span>
+              <span class="nav-label">Dashboard Neraca</span>
+            </div>
+            <span class="nav-badge">Live</span>
+          </li>
+
+          <li class="nav-item" data-target="datasets">
+            <div class="nav-item-left">
+              <span class="nav-icon-box"><i data-lucide="database" style="width:18px;height:18px;"></i></span>
+              <span class="nav-label">Eksplorasi Dataset</span>
+            </div>
+            <span class="nav-badge">2 CSV</span>
+          </li>
+
+          <li class="nav-item" data-target="model">
+            <div class="nav-item-left">
+              <span class="nav-icon-box"><i data-lucide="git-fork" style="width:18px;height:18px;"></i></span>
+              <span class="nav-label">Model Sistem Dinamik</span>
+            </div>
+            <span class="nav-badge">1.53%</span>
+          </li>
+
+          <li class="nav-item" data-target="simulator">
+            <div class="nav-item-left">
+              <span class="nav-icon-box"><i data-lucide="sliders-horizontal" style="width:18px;height:18px;"></i></span>
+              <span class="nav-label">Simulator Skenario</span>
+            </div>
+            <span class="nav-badge">2035</span>
+          </li>
+
+          <li class="nav-item" data-target="gallery">
+            <div class="nav-item-left">
+              <span class="nav-icon-box"><i data-lucide="image" style="width:18px;height:18px;"></i></span>
+              <span class="nav-label">Galeri Grafik & Laporan</span>
+            </div>
+            <span class="nav-badge">6 Fig</span>
+          </li>
+        </ul>
+
+        <!-- Quick Policy Switcher Widget -->
+        <div class="quick-preset-box">
+          <div class="quick-preset-title">
+            <i data-lucide="sparkles" style="width:14px;height:14px;color:#0284c7;"></i>
+            <span>Skenario Cepat Proyeksi</span>
+          </div>
+          <div class="preset-pills" id="sidebarPresets">
+            <button class="preset-pill-btn active" data-preset="bau">BAU</button>
+            <button class="preset-pill-btn" data-preset="s1">NRW Opt</button>
+            <button class="preset-pill-btn" data-preset="s2">Terpadu</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student Identity Card -->
+      <div class="student-card">
+        <div class="student-avatar">SM</div>
+        <div class="student-meta">
+          <div class="student-name">Sigit Miraj Permana</div>
+          <div class="student-nim"><span class="status-dot"></span>NIM 301240037 • FTI UNIBBA</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT WORKSPACE -->
+    <main class="main-content">
+      <!-- Top Header Bar -->
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i data-lucide="menu" style="width:18px;height:18px;"></i> Menu
+          </button>
+          <div class="page-heading-wrap">
+            <h1 id="topPageTitle">Dashboard Neraca Ketersediaan Air Bersih Kota Bandung</h1>
+            <p id="topPageSub">Pemodelan Sistem Dinamik Berbasis Data Empiris PDAM Tirtawening & Disdukcapil (2016–2035)</p>
+          </div>
+        </div>
+        <div class="topbar-chips">
+          <span class="info-chip">
+            <i data-lucide="check-circle-2" style="width:15px;height:15px;"></i>
+            MAPE Air: 1,53% | Populasi: 0,23%
+          </span>
+          <span class="info-chip teal">
+            <i data-lucide="cpu" style="width:15px;height:15px;"></i>
+            Euler Δt = 0,25 Thn
+          </span>
+        </div>
+      </header>
+
+      <!-- ==============================================================
+           MENU 1: DASHBOARD NERACA AIR
+           ============================================================== -->
+      <section class="tab-section active" id="sec-overview">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-title">Populasi Kota Bandung (2025)</span>
+              <span class="kpi-icon teal"><i data-lucide="users" style="width:19px;height:19px;"></i></span>
+            </div>
+            <div class="kpi-value">2.605.916 Jiwa</div>
+            <div class="kpi-sub">Tumbuh +0,97%/thn (CAGR 2017–2025)</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-title">Pasokan PDAM Aktual (2021)</span>
+              <span class="kpi-icon"><i data-lucide="droplets" style="width:19px;height:19px;"></i></span>
+            </div>
+            <div class="kpi-value">37,85 Jt m³</div>
+            <div class="kpi-sub">Menyusut -11,01% dibanding 2016 (42,53 Jt m³)</div>
+          </div>
+
+          <div class="kpi-card danger">
+            <div class="kpi-top">
+              <span class="kpi-title">Rasio Layanan Perpipaan (2035)</span>
+              <span class="kpi-icon rose"><i data-lucide="alert-triangle" style="width:19px;height:19px;"></i></span>
+            </div>
+            <div class="kpi-value" id="kpiCoverage2035">23,40%</div>
+            <div class="kpi-sub" id="kpiCoverageSub">Skenario Baseline (BAU) — Defisit Kritis</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-title">Target Skenario Terpadu (2035)</span>
+              <span class="kpi-icon amber"><i data-lucide="shield-check" style="width:19px;height:19px;"></i></span>
+            </div>
+            <div class="kpi-value">69,80%</div>
+            <div class="kpi-sub">Melampaui standar layanan kota (≥60%)</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <span class="card-title-icon"><i data-lucide="trending-up" style="width:18px;height:18px;"></i></span>
+                <div>
+                  <div class="card-title">Proyeksi Neraca Pasokan vs Kebutuhan Air (2016–2035)</div>
+                  <div class="card-subtitle">Perbandingan interaktif dalam satuan Juta Meter Kubik per Tahun</div>
+                </div>
+              </div>
+            </div>
+            <div class="chart-canvas-wrap">
+              <canvas id="overviewSupplyDemandChart"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <span class="card-title-icon" style="background:#ccfbf1;color:#0d9488;"><i data-lucide="gauge" style="width:18px;height:18px;"></i></span>
+                <div>
+                  <div class="card-title">Dinamika Tingkat Kehilangan Air (NRW %) & Rasio Layanan</div>
+                  <div class="card-subtitle">Dampak rehabilitasi pipa DMA terhadap efisiensi distribusi</div>
+                </div>
+              </div>
+            </div>
+            <div class="chart-canvas-wrap">
+              <canvas id="overviewNrwChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Embedded High-Res Summary Figure -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <span class="card-title-icon"><i data-lucide="bar-chart-3" style="width:18px;height:18px;"></i></span>
+              <div>
+                <div class="card-title">Visualisasi Sintesis Skenario Kebijakan Air Bersih Kota Bandung</div>
+                <div class="card-subtitle">Grafik resolusi tinggi (180 DPI) siap disisipkan langsung ke artikel/laporan UTS</div>
+              </div>
+            </div>
+            <a href="/download/chart/fig5_simulasi_skenario.png" class="btn-dl">
+              <i data-lucide="download" style="width:14px;height:14px;"></i> Unduh PNG
+            </a>
+          </div>
+          <div class="embedded-fig-box">
+            <img src="{{ url_for('static', filename='images/fig5_simulasi_skenario.png') }}" alt="Simulasi Skenario Air Bersih" onclick="openLightbox(this.src)">
+          </div>
+        </div>
+      </section>
+
+      <!-- ==============================================================
+           MENU 2: EKSPLORASI DATASET TERBUKA
+           ============================================================== -->
+      <section class="tab-section" id="sec-datasets">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <span class="card-title-icon"><i data-lucide="droplet" style="width:18px;height:18px;"></i></span>
+                <div>
+                  <div class="card-title">Grafik 1: Dinamika Pasokan Air PDAM Tirtawening</div>
+                  <div class="card-subtitle">72 observasi bulanan & akumulasi tahunan (2016–2021)</div>
+                </div>
+              </div>
+              <a href="/download/chart/fig1_eda_pasokan.png" class="btn-dl"><i data-lucide="download" style="width:14px;height:14px;"></i> PNG</a>
+            </div>
+            <div class="embedded-fig-box">
+              <img src="{{ url_for('static', filename='images/fig1_eda_pasokan.png') }}" alt="EDA Pasokan PDAM" onclick="openLightbox(this.src)">
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <span class="card-title-icon" style="background:#ccfbf1;color:#0d9488;"><i data-lucide="users-round" style="width:18px;height:18px;"></i></span>
+                <div>
+                  <div class="card-title">Grafik 2: Pertumbuhan Penduduk & Gap Kebutuhan Air</div>
+                  <div class="card-subtitle">Data Disdukcapil (2017–2025) vs standar 120–150 L/org/hari</div>
+                </div>
+              </div>
+              <a href="/download/chart/fig2_eda_penduduk_neraca.png" class="btn-dl"><i data-lucide="download" style="width:14px;height:14px;"></i> PNG</a>
+            </div>
+            <div class="embedded-fig-box">
+              <img src="{{ url_for('static', filename='images/fig2_eda_penduduk_neraca.png') }}" alt="EDA Penduduk dan Gap" onclick="openLightbox(this.src)">
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <span class="card-title-icon"><i data-lucide="table" style="width:18px;height:18px;"></i></span>
+                <div>
+                  <div class="card-title">Dataset 1: Distribusi Bulanan PDAM Tirtawening</div>
+                  <div class="card-subtitle">Sumber: Open Data Kota Bandung (Satuan: Meter Kubik)</div>
+                </div>
+              </div>
+              <select id="filterYearPdam" style="padding:6px 10px;border-radius:10px;border:1px solid #cbd5e1;font-size:0.8rem;font-weight:600;">
+                <option value="ALL">Semua Tahun (2016–2021)</option>
+                <option value="2016">Tahun 2016</option>
+                <option value="2017">Tahun 2017</option>
+                <option value="2018">Tahun 2018</option>
+                <option value="2019">Tahun 2019</option>
+                <option value="2020">Tahun 2020</option>
+                <option value="2021">Tahun 2021</option>
+              </select>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Tahun</th>
+                    <th>Bulan</th>
+                    <th>Volume Air Disalurkan (m³)</th>
+                  </tr>
+                </thead>
+                <tbody id="tbodyPdam"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <span class="card-title-icon" style="background:#ccfbf1;color:#0d9488;"><i data-lucide="user-check" style="width:18px;height:18px;"></i></span>
+                <div>
+                  <div class="card-title">Dataset 2: Jumlah Penduduk Kota Bandung</div>
+                  <div class="card-subtitle">Sumber: Disdukcapil Kota Bandung (2017–2025)</div>
+                </div>
+              </div>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Tahun</th>
+                    <th>Jumlah Penduduk (Jiwa)</th>
+                    <th>Kebutuhan Air 150 L/hr (m³)</th>
+                  </tr>
+                </thead>
+                <tbody id="tbodyPop"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==============================================================
+           MENU 3: MODEL SISTEM DINAMIK & VALIDASI
+           ============================================================== -->
+      <section class="tab-section" id="sec-model">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <span class="card-title-icon"><i data-lucide="network" style="width:18px;height:18px;"></i></span>
+              <div>
+                <div class="card-title">Arsitektur Stock & Flow Diagram (SFD) Neraca Air Kota Bandung</div>
+                <div class="card-subtitle">4 Kompartemen Stock utama dengan umpan balik pertumbuhan logistik & efisiensi pipa</div>
+              </div>
+            </div>
+            <a href="/download/chart/fig3_cld_sfd_diagram.png" class="btn-dl"><i data-lucide="download" style="width:14px;height:14px;"></i> Unduh Diagram SFD</a>
+          </div>
+          <div class="embedded-fig-box">
+            <img src="{{ url_for('static', filename='images/fig3_cld_sfd_diagram.png') }}" alt="Stock and Flow Diagram" onclick="openLightbox(this.src)">
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <span class="card-title-icon" style="background:#ccfbf1;color:#0d9488;"><i data-lucide="sigma" style="width:18px;height:18px;"></i></span>
+              <div>
+                <div class="card-title">Formulasi Persamaan Diferensial & Integrasi Numerik Euler</div>
+                <div class="card-subtitle">Persamaan matematis yang diimplementasikan di Google Colab & Backend Flask</div>
+              </div>
+            </div>
+          </div>
+          <div class="eq-grid">
+            <div class="eq-card">
+              <h4>1. Stock Populasi Penduduk — P(t)</h4>
+              <div class="eq-formula">dP/dt = r_pop · P(t) · (1 - P(t) / K_pop)</div>
+              <div class="eq-desc">Pertumbuhan logistik perkotaan dengan r_pop = 0,04317/thn dan daya dukung wilayah K_pop = 3.250.000 jiwa.</div>
+            </div>
+            <div class="eq-card">
+              <h4>2. Stock Kapasitas Produksi IPA — C_ipa(t)</h4>
+              <div class="eq-formula">dC_ipa/dt = α_spam · C_ipa(t) · I(t ≥ 2022)</div>
+              <div class="eq-desc">Kapasitas terpasang awal 63,50 juta m³/tahun dengan laju ekspansi infrastruktur SPAM baru α_spam.</div>
+            </div>
+            <div class="eq-card">
+              <h4>3. Stock Kebocoran Pipa — NRW(t)</h4>
+              <div class="eq-formula">dNRW/dt = -γ_rehab · (NRW(t) - NRW_floor)</div>
+              <div class="eq-desc">Menggambarkan dinamika penurunan kehilangan air dari 40,5% menuju batas teknis 16%–18% melalui zona DMA.</div>
+            </div>
+            <div class="eq-card">
+              <h4>4. Neraca Air Efektif & Eksploitasi Air Tanah</h4>
+              <div class="eq-formula">Q_dist = C_ipa · (1 - NRW) ; Neraca = Q_dist - Q_demand</div>
+              <div class="eq-desc">Selisih negatif menunjukkan defisit layanan perpipaan yang membebani cadangan air tanah Kota Bandung.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <span class="card-title-icon"><i data-lucide="badge-check" style="width:18px;height:18px;"></i></span>
+              <div>
+                <div class="card-title">Validasi Model Empiris (MAPE Pasokan = 1,53% | MAPE Populasi = 0,23%)</div>
+                <div class="card-subtitle">Uji kesesuaian kurva hasil simulasi terhadap data aktual Open Data Kota Bandung</div>
+              </div>
+            </div>
+            <a href="/download/chart/fig4_validasi_model.png" class="btn-dl"><i data-lucide="download" style="width:14px;height:14px;"></i> Unduh Grafik Validasi</a>
+          </div>
+          <div class="embedded-fig-box" style="margin-bottom:16px;">
+            <img src="{{ url_for('static', filename='images/fig4_validasi_model.png') }}" alt="Validasi Model" onclick="openLightbox(this.src)">
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Tahun</th>
+                  <th>Pasokan Aktual PDAM (m³)</th>
+                  <th>Hasil Simulasi SD (m³)</th>
+                  <th>Error Absolut (APE %)</th>
+                  <th>Status Validasi</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyValidation"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==============================================================
+           MENU 4: SIMULATOR INTERAKTIF SKENARIO (2016–2035)
+           ============================================================== -->
+      <section class="tab-section" id="sec-simulator">
+        <div class="grid-sidebar-sim">
+          <!-- Parameter Controls -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <span class="card-title-icon"><i data-lucide="sliders" style="width:18px;height:18px;"></i></span>
+                <div>
+                  <div class="card-title">Parameter Intervensi</div>
+                  <div class="card-subtitle">Geser slider untuk simulasi real-time</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="sim-preset-bar">
+              <button class="btn-preset-sim" onclick="applySimPreset('bau', this)">Baseline BAU</button>
+              <button class="btn-preset-sim active" onclick="applySimPreset('s1', this)">Optimasi NRW</button>
+              <button class="btn-preset-sim" onclick="applySimPreset('s2', this)">Terpadu SPAM</button>
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-label">Laju Rehabilitasi NRW (γ)</span>
+                <span class="slider-val-pill" id="valNrwRate">14% / thn</span>
+              </div>
+              <input type="range" id="sliderNrwRate" min="0" max="0.25" step="0.01" value="0.14">
+              <div class="slider-hint">Kecepatan penurunan kebocoran pipa mulai 2022</div>
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-label">Target Batas Bawah NRW</span>
+                <span class="slider-val-pill" id="valNrwFloor">18%</span>
+              </div>
+              <input type="range" id="sliderNrwFloor" min="0.12" max="0.35" step="0.01" value="0.18">
+              <div class="slider-hint">Batas minimum kebocoran teknis jaringan pipa</div>
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-label">Ekspansi Kapasitas IPA (α)</span>
+                <span class="slider-val-pill" id="valIpaRate">+1.5% / thn</span>
+              </div>
+              <input type="range" id="sliderIpaRate" min="0" max="0.07" step="0.005" value="0.015">
+              <div class="slider-hint">Penambahan debit SPAM baru (Gedebage/Gambung)</div>
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-label">Konsumsi Air Per Kapita</span>
+                <span class="slider-val-pill" id="valDemandLpd">150 L/org/hr</span>
+              </div>
+              <input type="range" id="sliderDemandLpd" min="110" max="180" step="5" value="150">
+              <div class="slider-hint">Standar SNI Kota Metropolitan: 150 L/orang/hari</div>
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-label">Faktor Laju Pertumbuhan Penduduk</span>
+                <span class="slider-val-pill" id="valPopMod">1.00x</span>
+              </div>
+              <input type="range" id="sliderPopMod" min="0.7" max="1.4" step="0.05" value="1.0">
+              <div class="slider-hint">1.00x = laju historis Disdukcapil (CAGR 0,97%)</div>
+            </div>
+          </div>
+
+          <!-- Simulation Output Charts & Table -->
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <span class="card-title-icon" style="background:#ccfbf1;color:#0d9488;"><i data-lucide="activity" style="width:18px;height:18px;"></i></span>
+                  <div>
+                    <div class="card-title">Kurva Simulasi Real-Time: Pasokan Kustom vs Baseline BAU</div>
+                    <div class="card-subtitle" id="simSummaryBanner">Proyeksi 2035 — Rasio Layanan: 39,3% | NRW Akhir: 20,7%</div>
+                  </div>
+                </div>
+              </div>
+              <div class="chart-canvas-wrap" style="height:330px;">
+                <canvas id="simulatorLiveChart"></canvas>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <span class="card-title-icon"><i data-lucide="list-ordered" style="width:18px;height:18px;"></i></span>
+                  <div>
+                    <div class="card-title">Tabel Proyeksi Tahunan Hasil Simulasi (2016–2035)</div>
+                    <div class="card-subtitle">Output numerik tiap tahun untuk lampiran analisis kebijakan</div>
+                  </div>
+                </div>
+              </div>
+              <div class="table-scroll" style="max-height:280px;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Tahun</th>
+                      <th>Populasi (Jiwa)</th>
+                      <th>NRW (%)</th>
+                      <th>Pasokan Efektif (Jt m³)</th>
+                      <th>Kebutuhan (Jt m³)</th>
+                      <th>Rasio Layanan (%)</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbodySimTable"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==============================================================
+           MENU 5: GALERI GRAFIK & RINGKASAN LAPORAN UTS
+           ============================================================== -->
+      <section class="tab-section" id="sec-gallery">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <span class="card-title-icon"><i data-lucide="images" style="width:18px;height:18px;"></i></span>
+              <div>
+                <div class="card-title">Galeri 6 Grafik Resolusi Tinggi (180 DPI) Siap Sisip Laporan</div>
+                <div class="card-subtitle">Klik gambar untuk memperbesar (Zoom) atau klik tombol Unduh PNG untuk dimasukkan ke Word</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="embedded-fig-box">
+              <img src="{{ url_for('static', filename='images/fig1_eda_pasokan.png') }}" alt="Gambar 1" onclick="openLightbox(this.src)">
+              <div class="fig-caption-bar">
+                <span class="fig-caption-text">Gambar 1. Dinamika Bulanan & Akumulasi Tahunan Pasokan PDAM</span>
+                <a href="/download/chart/fig1_eda_pasokan.png" class="btn-dl"><i data-lucide="download" style="width:13px;height:13px;"></i> PNG</a>
+              </div>
+            </div>
+
+            <div class="embedded-fig-box">
+              <img src="{{ url_for('static', filename='images/fig2_eda_penduduk_neraca.png') }}" alt="Gambar 2" onclick="openLightbox(this.src)">
+              <div class="fig-caption-bar">
+                <span class="fig-caption-text">Gambar 2. Pertumbuhan Penduduk & Kesenjangan Neraca Air</span>
+                <a href="/download/chart/fig2_eda_penduduk_neraca.png" class="btn-dl"><i data-lucide="download" style="width:13px;height:13px;"></i> PNG</a>
+              </div>
+            </div>
+
+            <div class="embedded-fig-box">
+              <img src="{{ url_for('static', filename='images/fig3_cld_sfd_diagram.png') }}" alt="Gambar 3" onclick="openLightbox(this.src)">
+              <div class="fig-caption-bar">
+                <span class="fig-caption-text">Gambar 3. Stock and Flow Diagram (SFD) Sistem Dinamik</span>
+                <a href="/download/chart/fig3_cld_sfd_diagram.png" class="btn-dl"><i data-lucide="download" style="width:13px;height:13px;"></i> PNG</a>
+              </div>
+            </div>
+
+            <div class="embedded-fig-box">
+              <img src="{{ url_for('static', filename='images/fig4_validasi_model.png') }}" alt="Gambar 4" onclick="openLightbox(this.src)">
+              <div class="fig-caption-bar">
+                <span class="fig-caption-text">Gambar 4. Uji Validasi Model Simulasi vs Data Aktual (MAPE)</span>
+                <a href="/download/chart/fig4_validasi_model.png" class="btn-dl"><i data-lucide="download" style="width:13px;height:13px;"></i> PNG</a>
+              </div>
+            </div>
+
+            <div class="embedded-fig-box">
+              <img src="{{ url_for('static', filename='images/fig5_simulasi_skenario.png') }}" alt="Gambar 5" onclick="openLightbox(this.src)">
+              <div class="fig-caption-bar">
+                <span class="fig-caption-text">Gambar 5. Perbandingan Proyeksi Pasokan & Rasio Layanan 2035</span>
+                <a href="/download/chart/fig5_simulasi_skenario.png" class="btn-dl"><i data-lucide="download" style="width:13px;height:13px;"></i> PNG</a>
+              </div>
+            </div>
+
+            <div class="embedded-fig-box">
+              <img src="{{ url_for('static', filename='images/fig6_analisis_sensitivitas.png') }}" alt="Gambar 6" onclick="openLightbox(this.src)">
+              <div class="fig-caption-bar">
+                <span class="fig-caption-text">Gambar 6. Matriks Analisis Sensitivitas Kebijakan (NRW vs SPAM)</span>
+                <a href="/download/chart/fig6_analisis_sensitivitas.png" class="btn-dl"><i data-lucide="download" style="width:13px;height:13px;"></i> PNG</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Lightbox Zoom Modal -->
+  <div class="modal-backdrop" id="lightboxModal" onclick="closeLightbox(event)">
+    <div class="modal-content">
+      <button class="modal-close" onclick="document.getElementById('lightboxModal').classList.remove('open')">✕</button>
+      <img id="lightboxImg" src="" alt="Preview Grafik">
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
